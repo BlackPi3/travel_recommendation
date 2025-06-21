@@ -1,23 +1,40 @@
 const searchInput = document.getElementById("searchInput");
 
 const searchBtn = document.getElementById('searchBtn');
-searchBtn.addEventListener('click', search);
+if (searchBtn) {
+    searchBtn.addEventListener('click', search);
+}
 
 const clearBtn = document.getElementById('clearBtn');
-clearBtn.addEventListener('click', clear);
+if (clearBtn) {
+    clearBtn.addEventListener('click', clear);
+}
+
+const result = document.getElementById("result");
 
 var travelCategories;
-fetch('./travel_recommendation_api.json')
-    .then(response => response.json())
-    .then(data => travelCategories = data)
-    .catch(error => alert("There's something wrong: ", error))
 
-function search() {
-    const input = searchInput.value.toLowerCase().trim();
+
+async function search() {
+    let input = searchInput.value;
     if (input) {
+        input = input.toLowerCase().trim();
+        if (input.includes("country")) {
+            input = 'countries';
+        }
+        if (!travelCategories) {
+            travelCategories = await getData();
+        }
+        clear();
         for (const t in travelCategories) {
-            if (input && t.includes(input)) {
-                alert(t);
+            if (t.includes(input)) {
+                for (const i of travelCategories[t]) {
+                    result.innerHTML +=
+                        `<div>
+                        <img src='${i.imageUrl}'>
+                        <h3>${i.name}</h3>
+                        </div>`;
+                }
             }
         }
 
@@ -25,6 +42,16 @@ function search() {
     }
 }
 
+async function getData() {
+    try {
+        const response = await fetch('./travel_recommendation_api.json');
+        const data = response.json();
+        return data;
+    } catch (error) {
+        alert("There's something wrong: ", error);
+    }
+}
+
 function clear() {
-    alert("clear results");
+    result.innerHTML = "";
 }
