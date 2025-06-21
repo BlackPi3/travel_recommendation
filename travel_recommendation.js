@@ -28,17 +28,30 @@ async function search() {
         clear();
         for (const t in travelCategories) {
             if (t.includes(input)) {
+                result.style.display = 'block';
+                searchInput.value = "";
+                
                 for (const i of travelCategories[t]) {
-                    result.innerHTML +=
-                        `<div>
-                        <img src='${i.imageUrl}'>
-                        <h3>${i.name}</h3>
-                        </div>`;
+                    if (i.cities) {
+                        for (const c of i.cities) {
+                            result.innerHTML +=
+                                `<div>
+                                <img src='${c.imageUrl}' class='result-img'>
+                                <h3>${c.name}</h3>
+                                <p>${c.description}</p>
+                                </div>`;
+                        }
+                    } else {
+                        result.innerHTML +=
+                            `<div>
+                            <img src='${i.imageUrl}' class='result-img'>
+                            <h3>${i.name}</h3>
+                            <p>${i.description}</p>
+                            </div>`;
+                    }
                 }
             }
         }
-
-        searchInput.value = "";
     }
 }
 
@@ -54,4 +67,5 @@ async function getData() {
 
 function clear() {
     result.innerHTML = "";
+    result.style.display = 'none';
 }
